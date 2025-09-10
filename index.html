@@ -7,11 +7,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="estilo.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#a200ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
     <title>Checklist</title>
 </head>
 
 <body>
-    
+
     <h1 id="titulo">Checklist</h1>
 
     <input type="text" id="titleInput" placeholder="Agregar materia, curso o título..." />
@@ -126,6 +132,13 @@
 
         // Render inicial al cargar página
         renderTitles();
+    </script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./sw.js")
+                .then(() => console.log("Service Worker registrado"))
+                .catch((err) => console.log("Error SW:", err));
+        }
     </script>
 
 </body>
