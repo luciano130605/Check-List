@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="estilo.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <title>Checklist</title>
+</head>
+
+<body>
+    
+    <h1 id="titulo">Checklist</h1>
+
+    <input type="text" id="titleInput" placeholder="Agregar materia, curso o título..." />
+    <button id="addTitle">Agregar Título</button>
+
+    <div id="titlesContainer"></div>
+
+    <script>
+        const titleInput = document.getElementById('titleInput');
+        const addTitleBtn = document.getElementById('addTitle');
+        const titlesContainer = document.getElementById('titlesContainer');
+
+        // Recuperar títulos y tareas desde LocalStorage
+        let titlesData = JSON.parse(localStorage.getItem('titlesData')) || [];
+
+        function saveToLocalStorage() {
+            localStorage.setItem('titlesData', JSON.stringify(titlesData));
+        }
+
+        function renderTitles() {
+            titlesContainer.innerHTML = '';
+            titlesData.forEach((titleObj, titleIndex) => {
+                const titleDiv = document.createElement('div');
+
+                const h2 = document.createElement('h2');
+                h2.textContent = titleObj.title;
+
+                // Botón borrar título
+                const deleteBtn = document.createElement('button');
+                deleteBtn.classList.add('delete-title');
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.addEventListener('click', () => {
+                    titlesData.splice(titleIndex, 1);
+                    saveToLocalStorage();
+                    renderTitles();
+                });
+
+                h2.appendChild(deleteBtn);
+
+                // Input y botón agregar tarea
+                const taskInput = document.createElement('input');
+                taskInput.type = 'text';
+                taskInput.placeholder = 'Agregar tarea';
+                taskInput.classList.add('task-input');
+
+                const addTaskBtn = document.createElement('button');
+                addTaskBtn.textContent = 'Agregar';
+
+                const ul = document.createElement('ul');
+
+                // Renderizar tareas existentes
+                titleObj.tasks.forEach((task, taskIndex) => {
+                    const li = document.createElement('li');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    const span = document.createElement('span');
+                    span.textContent = task;
+
+                    li.appendChild(checkbox);
+                    li.appendChild(span);
+                    ul.appendChild(li);
+
+                    checkbox.addEventListener('change', () => {
+                        if (checkbox.checked) {
+                            titleObj.tasks.splice(taskIndex, 1);
+                            saveToLocalStorage();
+                            renderTitles();
+                        }
+                    });
+                });
+
+                // Agregar tarea nueva
+                addTaskBtn.addEventListener('click', () => {
+                    const taskText = taskInput.value.trim();
+                    if (taskText === '') return;
+
+                    titleObj.tasks.push(taskText);
+                    saveToLocalStorage();
+                    renderTitles();
+                    taskInput.value = '';
+                    taskInput.focus();
+                });
+
+                taskInput.addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter') addTaskBtn.click();
+                });
+
+                titleDiv.appendChild(h2);
+                titleDiv.appendChild(taskInput);
+                titleDiv.appendChild(addTaskBtn);
+                titleDiv.appendChild(ul);
+                titlesContainer.appendChild(titleDiv);
+            });
+        }
+
+        // Agregar título nuevo
+        addTitleBtn.addEventListener('click', () => {
+            const titleText = titleInput.value.trim();
+            if (titleText === '') return;
+
+            titlesData.push({ title: titleText, tasks: [] });
+            saveToLocalStorage();
+            renderTitles();
+
+            titleInput.value = '';
+            titleInput.focus();
+        });
+
+        titleInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') addTitleBtn.click();
+        });
+
+        // Render inicial al cargar página
+        renderTitles();
+    </script>
+
+</body>
+
+</html>
